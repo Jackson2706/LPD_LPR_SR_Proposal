@@ -1,0 +1,1 @@
+from .LPD import MyLicensePlateModel

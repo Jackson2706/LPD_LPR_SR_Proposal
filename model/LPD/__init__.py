@@ -1,0 +1,1 @@
+from .Samplemodel import MyLicensePlateModel
