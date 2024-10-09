@@ -1,1 +1,1 @@
-from .Samplemodel import MyLicensePlateModel
+from .Faster_RCNN import Faster_RCNN

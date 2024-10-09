@@ -1,1 +1,1 @@
-from .LPD import MyLicensePlateModel
+from .LPD import Faster_RCNN
