@@ -1,7 +1,0 @@
-run:
-python3 inference_realesrgan.py -n RealESRGAN_x4plus -i inputs --model_path experiments/train_test_dataset23/models/net_g_latest.pth --face_enhance
-train:
-python3 realesrgan/train.py -opt options/train_test_dataset2_x4.yml --auto_resume
-
-Create metadata:
-python3 scripts/generate_meta_info.py --input datasets/test_datasets/test_dataset_multilscale4 datasets/test_datasets/test_dataset_HR4 --root datasets/test_datasets datasets/test_datasets --meta_info datasets/test_datasets/test_datasets_infor/meta_infor_testdatasets4.txt
