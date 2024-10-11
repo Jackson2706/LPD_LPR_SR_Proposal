@@ -30,3 +30,6 @@ class LicensePlateDataset(Dataset):
         HR_image = Image.open(os.path.join(self.HR_folder_path,HR_tail[index]))
         HR_image = self.transforms(HR_image)
         return (LR_image, HR_image)
+    
+    def transform_sample(self, image):
+        return self.transforms(image)
