@@ -3,8 +3,7 @@ import torch.nn as nn
 import torchvision.transforms.functional as TF
 import sys
 import os
-sys.path.append(os.path.abspath('../'))
-
+sys.path.append(os.path.abspath('./model/SR'))
 
 import SR
 
