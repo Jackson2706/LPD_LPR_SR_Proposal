@@ -1,1 +1,0 @@
-from .Faster_RCNN import Faster_RCNN

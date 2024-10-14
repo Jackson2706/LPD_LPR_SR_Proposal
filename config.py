@@ -2,6 +2,8 @@ from model import MyLicensePlateModel
 
 config ={
     "model": {
-        "LPD": MyLicensePlateModel(),
+        "LPD": {
+            "Model1": MyLicensePlateModel
+        },
     }
 }

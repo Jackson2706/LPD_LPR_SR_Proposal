@@ -1,8 +1,13 @@
 import os
 import torch
 from PIL import Image
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+from Dataset.dataset import CustomImageDataset
 
-from dataset.dataset import CustomImageDataset
+
+
+
 
 class LicensePlateDataset(CustomImageDataset):
     '''

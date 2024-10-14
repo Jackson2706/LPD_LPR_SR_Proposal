@@ -1,1 +1,0 @@
-from .model import Faster_RCNN

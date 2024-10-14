@@ -1,23 +1,45 @@
-
+import os
+import sys
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torchvision
-from torchvision import ops
 
-from model.LPD.LPD import LicensePlateDetection
 from utils import *
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from LPD import LicensePlateDetection
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class Faster_RCNN(LicensePlateDetection):
-    def __init__(self, img_size, out_size, out_channels, n_classes, roi_size, feature_extractor):
-        super().__init__()
+    def __init__(self, img_size, roi_size, feature_extractor, n_classes = 1):
+        super().__init__("FasterRCNN")
+        self.backbone = feature_extractor
+        self.img_size = img_size  # (height, width)
+        self.roi_size = roi_size  # (height, width)
+        self.n_classes = n_classes
+
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.backbone = self.backbone.to(device)
+
+        # Use a dummy input to calculate out_channels, out_h, out_w
+        dummy_input = torch.randn(1, 3, self.img_size[0], self.img_size[1]).to(device)
+        out = self.backbone(dummy_input)
+        out_c, out_h, out_w = out.size(1), out.size(2), out.size(3)
+
+        self.out_size = (out_h, out_w)
+        self.out_channels = out_c
+
+        # Calculate scale factors
+        self.width_scale_factor = self.img_size[1] // out_w
+        self.height_scale_factor = self.img_size[0] // out_h
+
         self.rpn = RegionProposalNetwork(
-            img_size, out_size, out_channels, feature_extractor)
+            self.img_size, self.out_size, self.out_channels, feature_extractor)
         self.classifier = ClassificationModule(
-            out_channels, n_classes, roi_size)
+            self.out_channels, n_classes, roi_size)
 
     def forward(self, images, gt_bboxes, gt_classes):
         total_rpn_loss, feature_map, proposals, \
