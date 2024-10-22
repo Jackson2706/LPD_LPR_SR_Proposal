@@ -3,15 +3,14 @@ import torch.nn as nn
 import torchvision.transforms.functional as TF
 import sys
 import os
-sys.path.append(os.path.abspath('./model/SR'))
-
-import SR
-
+# sys.path.append(os.path.abspath('./model/SR'))
+# import SR
+from ..SR import SuperResolutionModel
 
 in_channels = 3
 out_channels = 3
 
-class DoubleConv2d(SR.SuperResolutionModel):
+class DoubleConv2d(SuperResolutionModel):
     def __init__(self, in_channels, out_channels):
         super().__init__()
         self.conv=nn.Sequential(
@@ -27,7 +26,7 @@ class DoubleConv2d(SR.SuperResolutionModel):
         x=self.conv(x)
         return x
     
-class UNET(SR.SuperResolutionModel):
+class UNET(SuperResolutionModel):
     def __init__(self, in_channels=in_channels, out_channels=out_channels, features=[64,128]):
         super().__init__()
         self.downs=nn.ModuleList()
