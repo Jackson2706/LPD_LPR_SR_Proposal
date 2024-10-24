@@ -1,19 +1,14 @@
-import os
-import sys
-import torch
 import torch.nn as nn
 import torchvision
 
-from utils import *
+from .utils import *
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from LPD import LicensePlateDetection
-
+from model.LPD import LPD
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-class Faster_RCNN(LicensePlateDetection):
+class Faster_RCNN(LPD.LicensePlateDetection):
     def __init__(self, img_size, roi_size, feature_extractor, n_classes = 1):
         super().__init__("FasterRCNN")
         self.backbone = feature_extractor
