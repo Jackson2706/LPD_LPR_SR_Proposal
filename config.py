@@ -1,9 +1,7 @@
-from model import MyLicensePlateModel
+from model.LPD.Faster_RCNN.model import Faster_RCNN
 
 config ={
     "model": {
-        "LPD": {
-            "Model1": MyLicensePlateModel
-        },
-    }
+        "LPD": Faster_RCNN
+    },
 }
