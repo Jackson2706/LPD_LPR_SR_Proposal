@@ -6,16 +6,50 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from dataset.dataset import CustomImageDataset
 
 
+def parse_annotation(label_path):
+    gt_boxes_all = []
+    gt_keypoint_all = []
+    gt_classes_all = []
+
+    with open(label_path, "r") as f:
+        lines = f.readlines()
+
+    for line in lines:
+        line_split = line.strip().split()
+        # Extract keypoint
+        x1, y1, x2, y2, x3, y3, x4, y4 = map(float, line_split[1:])
+
+        # Bounding box calculation
+        x_min = min(x1, x2, x3, x4)
+        y_min = min(y1, y2, y3, y4)
+        x_max = max(x1, x2, x3, x4)
+        y_max = max(y1, y2, y3, y4)
+        bbox = torch.Tensor([x_min, y_min, x_max, y_max])
+
+        # Keypoint as a flat array of 8 values (x1, y1, x2, y2, x3, y3, x4, y4)
+        keypoint = torch.Tensor([x1, y1, x2, y2, x3, y3, x4, y4])
+
+        gt_boxes_all.append(bbox)
+        gt_keypoint_all.append(keypoint)
+        gt_classes_all.append(0)  # Single class for license plates
+
+    gt_boxes = torch.stack(gt_boxes_all)
+    gt_keypoint = torch.stack(gt_keypoint_all)
+    gt_classes = torch.tensor(gt_classes_all)
+
+    return gt_boxes, gt_keypoint, gt_classes
+
+
 class LicensePlateDataset(CustomImageDataset):
-    '''
-    A Pytorch Dataset class to load images, bounding boxes, and keypoints lazily.
+    """
     Returns:
     images: torch.Tensor of size (C, H, W)
     gt_bboxes: torch.Tensor of size (max_objects, 4)
-    gt_keypoints: torch.Tensor of size (max_objects, 8) # 8 for 4 keypoints (x1, y1, x2, y2, x3, y3, x4, y4)
+    gt_keypoint: torch.Tensor of size (max_objects, 8) # 8 for 4 keypoint (x1, y1, x2, y2, x3, y3, x4, y4)
     gt_classes: torch.Tensor of size (max_objects)
-    '''
-    def __init__(self, img_dir, label_dir, transform=None):
+    """
+    def __init__(self, img_dir, label_dir, dataset_path: str, transform=None):
+        super().__init__(dataset_path, transform)
         self.img_dir = img_dir
         self.label_dir = label_dir
         self.transform = transform
@@ -34,39 +68,6 @@ class LicensePlateDataset(CustomImageDataset):
             img_tensor = self.transform(img)
 
         label_path = self.label_paths[idx]
-        gt_boxes, gt_keypoints, gt_classes = self.parse_annotation(label_path)
+        gt_boxes, gt_keypoint, gt_classes = parse_annotation(label_path)
 
-        return img_tensor, gt_boxes, gt_keypoints, gt_classes
-
-    def parse_annotation(self, label_path):
-        gt_boxes_all = []
-        gt_keypoints_all = []
-        gt_classes_all = []
-        
-        with open(label_path, "r") as f:
-            lines = f.readlines()
-
-        for line in lines:
-            line_split = line.strip().split()
-            # Extract keypoints
-            x1, y1, x2, y2, x3, y3, x4, y4 = map(float, line_split[1:])
-            
-            # Bounding box calculation
-            x_min = min(x1, x2, x3, x4)
-            y_min = min(y1, y2, y3, y4)
-            x_max = max(x1, x2, x3, x4)
-            y_max = max(y1, y2, y3, y4)
-            bbox = torch.Tensor([x_min, y_min, x_max, y_max])
-
-            # Keypoints as a flat array of 8 values (x1, y1, x2, y2, x3, y3, x4, y4)
-            keypoints = torch.Tensor([x1, y1, x2, y2, x3, y3, x4, y4])
-
-            gt_boxes_all.append(bbox)
-            gt_keypoints_all.append(keypoints)
-            gt_classes_all.append(0)  # Single class for license plates
-
-        gt_boxes = torch.stack(gt_boxes_all)
-        gt_keypoints = torch.stack(gt_keypoints_all)
-        gt_classes = torch.tensor(gt_classes_all)
-
-        return gt_boxes, gt_keypoints, gt_classes
+        return img_tensor, gt_boxes, gt_keypoint, gt_classes
